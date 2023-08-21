@@ -1,9 +1,9 @@
 package com.portfolio.course.entities;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -12,9 +12,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+
 
 @Entity
 @Table(name = "tb_product")
@@ -32,9 +34,15 @@ public class Product implements Serializable {
 	private Double price;
 	private String imgUrl;
 	
-	@ManyToOne
-	@JoinColumn(name = "category_id")
-	private Category category;
+	
+	@ManyToMany
+	@JoinTable(name = "tb_product_category", 
+	joinColumns = @JoinColumn(name = "product_id"),
+	inverseJoinColumns = @JoinColumn(name = "category_id"))
+	private Set<Category> categories = new HashSet<>();
+	
+	@OneToMany(mappedBy="id.product")
+	private Set<OrderItem> items = new HashSet<>();
 	
 	
 	public Product() {
@@ -42,13 +50,12 @@ public class Product implements Serializable {
 		
 	}
 	
-	public Product(Long id, String name, String description, Double price, String imgUrl, Category category) {
+	public Product(Long id, String name, String description, Double price, String imgUrl) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.price = price;
 		this.imgUrl = imgUrl;
-		this.category = category;
 	}
 
 	public Long getId() {
@@ -91,17 +98,21 @@ public class Product implements Serializable {
 		this.imgUrl = imgUrl;
 	}
 
-	public Category getCategory() {
-		return category;
+	
+	@JsonIgnore
+	public Set<Order> getOrders(){
+		Set<Order> orders = new HashSet<>();
+		
+		for(OrderItem x: items) {
+			orders.add(x.getOrder());
+		}
+		return orders;
 	}
-
-	public void setCategory(Category category) {
-		this.category = category;
-	}
+	
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(category, description, id, imgUrl, name, price);
+		return Objects.hash(description, id, imgUrl, name, price);
 	}
 
 	@Override
@@ -113,15 +124,23 @@ public class Product implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Product other = (Product) obj;
-		return Objects.equals(category, other.category) && Objects.equals(description, other.description)
-				&& Objects.equals(id, other.id) && Objects.equals(imgUrl, other.imgUrl)
-				&& Objects.equals(name, other.name) && Objects.equals(price, other.price);
+		return Objects.equals(description, other.description) && Objects.equals(id, other.id)
+				&& Objects.equals(imgUrl, other.imgUrl) && Objects.equals(name, other.name)
+				&& Objects.equals(price, other.price);
 	}
+	
+	
 
 	@Override
 	public String toString() {
 		return "Product [id=" + id + ", name=" + name + ", description=" + description + ", price=" + price
-				+ ", imgUrl=" + imgUrl + ", category=" + category + "]";
+				+ ", imgUrl=" + imgUrl + "]";
+	}
+	
+	
+
+	public Set<Category> getCategories() {
+		return categories;
 	}
 	
 	

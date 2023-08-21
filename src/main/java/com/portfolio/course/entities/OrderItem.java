@@ -1,51 +1,81 @@
 package com.portfolio.course.entities;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class OrderItem {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.portfolio.course.entities.pk.OrderItemPK;
+
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+
+@Entity
+@Table(name="tb_order_item")
+public class OrderItem implements Serializable	{
 	
-	private Product product;
+
+	private static final long serialVersionUID = 1L;
+	
+	@EmbeddedId
+	private OrderItemPK id = new OrderItemPK();
+	
+	private Double price;
 	private Integer quantity;
 	
 	public OrderItem() {
 		
+		
 	}
-	
-	
-	
-	
-	public OrderItem(Product product, Integer quantity) {
+
+	public OrderItem(Order order, Product product, Double price, Integer quantity) {
 		super();
-		this.product = product;
+		this.price = price;
 		this.quantity = quantity;
+		id.setOrder(order);
+		id.setProduct(product);
 	}
-
-
-
-
+	
+	
+	@JsonIgnore
+	public Order getOrder() {
+		return id.getOrder();
+	}
+	
+	public void setOrder(Order order) {
+		id.setOrder(order);
+	}
+	
+	
 	public Product getProduct() {
-		return product;
+		return id.getProduct();
 	}
+	
 	public void setProduct(Product product) {
-		this.product = product;
+		id.setProduct(product);
 	}
+
+	public Double getPrice() {
+		return price;
+	}
+
+	public void setPrice(Double price) {
+		this.price = price;
+	}
+
 	public Integer getQuantity() {
 		return quantity;
 	}
+
 	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
 	}
 
-
-
-
 	@Override
 	public int hashCode() {
-		return Objects.hash(product, quantity);
+		return Objects.hash(id);
 	}
-
-
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -56,23 +86,20 @@ public class OrderItem {
 		if (getClass() != obj.getClass())
 			return false;
 		OrderItem other = (OrderItem) obj;
-		return Objects.equals(product, other.product) && Objects.equals(quantity, other.quantity);
+		return Objects.equals(id, other.id);
 	}
-
-
-
 
 	@Override
 	public String toString() {
-		return "OrderItem [product=" + product + ", quantity=" + quantity + "]";
+		return "OrderItem [id=" + id + ", price=" + price + ", quantity=" + quantity + "]";
 	}
 	
-	public double subTotal() {
-		double total;
-		total = product.getPrice()*quantity;
-		
-		return total;
-	}
+	
+	
+	
+	
+	
+	
 	
 	
 	
