@@ -11,12 +11,14 @@ import org.springframework.context.annotation.Profile;
 import com.portfolio.course.entities.Category;
 import com.portfolio.course.entities.Order;
 import com.portfolio.course.entities.OrderItem;
+import com.portfolio.course.entities.Payment;
 import com.portfolio.course.entities.Product;
 import com.portfolio.course.entities.User;
 import com.portfolio.course.entities.enums.OrderStatus;
 import com.portfolio.course.repositories.CategoryRepository;
 import com.portfolio.course.repositories.OrderItemRepository;
 import com.portfolio.course.repositories.OrderRepository;
+import com.portfolio.course.repositories.PaymentRepository;
 import com.portfolio.course.repositories.ProductRepository;
 import com.portfolio.course.repositories.UserRepository;
 
@@ -38,6 +40,9 @@ public class TestConfig implements CommandLineRunner {
 	
 	@Autowired
 	private OrderItemRepository orderItemRepository;
+	
+	@Autowired
+	private PaymentRepository paymentRepository;
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -85,6 +90,12 @@ public class TestConfig implements CommandLineRunner {
 		OrderItem oi3 = new OrderItem(o2, p3, p3.getPrice(),2); 
 		OrderItem oi4 = new OrderItem(o3, p5,p5.getPrice(), 2); 
 		orderItemRepository.saveAll(Arrays.asList(oi1, oi2, oi3, oi4));
+		
+		
+		Payment pay1 = new Payment(null, Instant.parse("2019-06-20T19:53:07Z"), o1);
+		
+		o1.setPayment(pay1);
+		orderRepository.save(o1);
 		
 	}
 	
